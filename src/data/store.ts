@@ -1,74 +1,149 @@
-import { seedJobs, type Job, type Volunteer } from './jobs'
+import {
+  seedEvents,
+  type EventJob,
+  type OpsEvent,
+  type SignupStyle,
+  type Slot,
+  type Volunteer,
+} from './events'
 
-// In-memory mock store. All mutations resolve async to simulate a real API.
-let jobs: Job[] = structuredClone(seedJobs)
+let events: OpsEvent[] = structuredClone(seedEvents)
 
 const delay = (ms = 180) => new Promise((r) => setTimeout(r, ms))
-
 const uid = () => Math.random().toString(36).slice(2, 10)
 
-export async function listJobs(): Promise<Job[]> {
+export async function listEvents(): Promise<OpsEvent[]> {
   await delay()
-  return structuredClone(jobs).sort((a, b) => a.date.localeCompare(b.date))
+  return structuredClone(events).sort((a, b) => a.date.localeCompare(b.date))
 }
 
-export async function getJob(id: string): Promise<Job | undefined> {
+export async function getEvent(id: string): Promise<OpsEvent | undefined> {
   await delay()
-  const job = jobs.find((j) => j.id === id)
-  return job ? structuredClone(job) : undefined
+  const ev = events.find((e) => e.id === id)
+  return ev ? structuredClone(ev) : undefined
+}
+
+// ---- creating events ---------------------------------------------------
+
+export interface NewSlotInput {
+  startTime?: string
+  endTime?: string
+  capacity: number
 }
 
 export interface NewJobInput {
+  name: string
+  description?: string
+  slots: NewSlotInput[]
+}
+
+export interface NewEventInput {
   title: string
   details: string
   location: string
   date: string
-  startTime: string
-  durationHours: number
-  crewNeeded: number
+  startTime?: string
+  endTime?: string
   postedBy: string
+  signupStyle: SignupStyle
+  jobs: NewJobInput[]
 }
 
-export async function createJob(input: NewJobInput): Promise<Job> {
+export async function createEvent(input: NewEventInput): Promise<OpsEvent> {
   await delay()
-  const job: Job = {
+  const ev: OpsEvent = {
     id: uid(),
-    ...input,
+    title: input.title,
+    details: input.details,
+    location: input.location,
+    date: input.date,
+    startTime: input.startTime,
+    endTime: input.endTime,
+    postedBy: input.postedBy,
     status: 'open',
-    volunteers: [],
+    signupStyle: input.signupStyle,
+    jobs: input.jobs.map<EventJob>((j) => ({
+      id: uid(),
+      name: j.name,
+      description: j.description,
+      slots: j.slots.map<Slot>((s) => ({
+        id: uid(),
+        startTime: s.startTime,
+        endTime: s.endTime,
+        capacity: s.capacity,
+        volunteers: [],
+      })),
+    })),
   }
-  jobs = [job, ...jobs]
-  return structuredClone(job)
+  events = [ev, ...events]
+  return structuredClone(ev)
 }
 
-export async function addVolunteer(jobId: string, name: string): Promise<Job> {
-  await delay()
-  const idx = jobs.findIndex((j) => j.id === jobId)
-  if (idx === -1) throw new Error('Job not found')
-  const volunteer: Volunteer = {
-    id: uid(),
-    name: name.trim(),
-    signedUpAt: new Date().toISOString(),
-  }
-  jobs[idx] = { ...jobs[idx], volunteers: [...jobs[idx].volunteers, volunteer] }
-  return structuredClone(jobs[idx])
+// ---- sign-up mutations -------------------------------------------------
+
+function mutateSlot(
+  eventId: string,
+  jobId: string,
+  slotId: string,
+  fn: (slot: Slot) => Slot,
+): OpsEvent {
+  const eIdx = events.findIndex((e) => e.id === eventId)
+  if (eIdx === -1) throw new Error('Event not found')
+  const event = events[eIdx]
+  const jIdx = event.jobs.findIndex((j) => j.id === jobId)
+  if (jIdx === -1) throw new Error('Job not found')
+  const job = event.jobs[jIdx]
+  const sIdx = job.slots.findIndex((s) => s.id === slotId)
+  if (sIdx === -1) throw new Error('Slot not found')
+
+  const newSlot = fn(job.slots[sIdx])
+  const newSlots = job.slots.slice()
+  newSlots[sIdx] = newSlot
+  const newJobs = event.jobs.slice()
+  newJobs[jIdx] = { ...job, slots: newSlots }
+  events[eIdx] = { ...event, jobs: newJobs }
+  return events[eIdx]
 }
 
-export async function removeVolunteer(jobId: string, volunteerId: string): Promise<Job> {
+export async function signUp(
+  eventId: string,
+  jobId: string,
+  slotId: string,
+  name: string,
+): Promise<OpsEvent> {
   await delay()
-  const idx = jobs.findIndex((j) => j.id === jobId)
-  if (idx === -1) throw new Error('Job not found')
-  jobs[idx] = {
-    ...jobs[idx],
-    volunteers: jobs[idx].volunteers.filter((v) => v.id !== volunteerId),
-  }
-  return structuredClone(jobs[idx])
+  const event = mutateSlot(eventId, jobId, slotId, (slot) => {
+    if (slot.volunteers.length >= slot.capacity) {
+      throw new Error('Slot is full')
+    }
+    const volunteer: Volunteer = {
+      id: uid(),
+      name: name.trim(),
+      signedUpAt: new Date().toISOString(),
+    }
+    return { ...slot, volunteers: [...slot.volunteers, volunteer] }
+  })
+  return structuredClone(event)
 }
 
-export async function markDone(jobId: string): Promise<Job> {
+export async function removeVolunteer(
+  eventId: string,
+  jobId: string,
+  slotId: string,
+  volunteerId: string,
+): Promise<OpsEvent> {
   await delay()
-  const idx = jobs.findIndex((j) => j.id === jobId)
-  if (idx === -1) throw new Error('Job not found')
-  jobs[idx] = { ...jobs[idx], status: 'done' }
-  return structuredClone(jobs[idx])
+  const event = mutateSlot(eventId, jobId, slotId, (slot) => ({
+    ...slot,
+    volunteers: slot.volunteers.filter((v) => v.id !== volunteerId),
+  }))
+  return structuredClone(event)
+}
+
+export async function markDone(eventId: string): Promise<OpsEvent> {
+  await delay()
+  const idx = events.findIndex((e) => e.id === eventId)
+  if (idx === -1) throw new Error('Event not found')
+  events[idx] = { ...events[idx], status: 'done' }
+  return structuredClone(events[idx])
 }

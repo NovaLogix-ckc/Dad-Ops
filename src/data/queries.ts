@@ -1,65 +1,79 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  addVolunteer,
-  createJob,
-  getJob,
-  listJobs,
+  createEvent,
+  getEvent,
+  listEvents,
   markDone,
   removeVolunteer,
-  type NewJobInput,
+  signUp,
+  type NewEventInput,
 } from './store'
 
-export const jobsQuery = () =>
+export const eventsQuery = () =>
   queryOptions({
-    queryKey: ['jobs'],
-    queryFn: listJobs,
+    queryKey: ['events'],
+    queryFn: listEvents,
   })
 
-export const jobQuery = (id: string) =>
+export const eventQuery = (id: string) =>
   queryOptions({
-    queryKey: ['jobs', id],
-    queryFn: () => getJob(id),
+    queryKey: ['events', id],
+    queryFn: () => getEvent(id),
   })
 
-export function useCreateJob() {
+export function useCreateEvent() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (input: NewJobInput) => createJob(input),
+    mutationFn: (input: NewEventInput) => createEvent(input),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['jobs'] })
+      qc.invalidateQueries({ queryKey: ['events'] })
     },
   })
 }
 
-export function useAddVolunteer(jobId: string) {
+interface SignUpArgs {
+  jobId: string
+  slotId: string
+  name: string
+}
+
+export function useSignUp(eventId: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (name: string) => addVolunteer(jobId, name),
-    onSuccess: (job) => {
-      qc.setQueryData(['jobs', jobId], job)
-      qc.invalidateQueries({ queryKey: ['jobs'] })
+    mutationFn: ({ jobId, slotId, name }: SignUpArgs) =>
+      signUp(eventId, jobId, slotId, name),
+    onSuccess: (event) => {
+      qc.setQueryData(['events', eventId], event)
+      qc.invalidateQueries({ queryKey: ['events'] })
     },
   })
 }
 
-export function useRemoveVolunteer(jobId: string) {
+interface RemoveArgs {
+  jobId: string
+  slotId: string
+  volunteerId: string
+}
+
+export function useRemoveVolunteer(eventId: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (volunteerId: string) => removeVolunteer(jobId, volunteerId),
-    onSuccess: (job) => {
-      qc.setQueryData(['jobs', jobId], job)
-      qc.invalidateQueries({ queryKey: ['jobs'] })
+    mutationFn: ({ jobId, slotId, volunteerId }: RemoveArgs) =>
+      removeVolunteer(eventId, jobId, slotId, volunteerId),
+    onSuccess: (event) => {
+      qc.setQueryData(['events', eventId], event)
+      qc.invalidateQueries({ queryKey: ['events'] })
     },
   })
 }
 
-export function useMarkDone(jobId: string) {
+export function useMarkDone(eventId: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: () => markDone(jobId),
-    onSuccess: (job) => {
-      qc.setQueryData(['jobs', jobId], job)
-      qc.invalidateQueries({ queryKey: ['jobs'] })
+    mutationFn: () => markDone(eventId),
+    onSuccess: (event) => {
+      qc.setQueryData(['events', eventId], event)
+      qc.invalidateQueries({ queryKey: ['events'] })
     },
   })
 }

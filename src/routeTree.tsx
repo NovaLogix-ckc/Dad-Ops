@@ -1,9 +1,9 @@
 import { createRootRouteWithContext, createRoute, Outlet } from '@tanstack/react-router'
 import type { QueryClient } from '@tanstack/react-query'
 import { Layout } from './components/Layout'
-import { JobsPage } from './pages/JobsPage'
-import { JobDetailPage } from './pages/JobDetailPage'
-import { NewJobPage } from './pages/NewJobPage'
+import { EventsPage } from './pages/EventsPage'
+import { EventDetailPage } from './pages/EventDetailPage'
+import { NewEventPage } from './pages/NewEventPage'
 import { AboutPage } from './pages/AboutPage'
 
 interface RouterContext {
@@ -21,19 +21,19 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: JobsPage,
+  component: EventsPage,
 })
 
-const jobDetailRoute = createRoute({
+const eventDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/jobs/$jobId',
-  component: JobDetailPage,
+  path: '/events/$eventId',
+  component: EventDetailPage,
 })
 
-const newJobRoute = createRoute({
+const newEventRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/new',
-  component: NewJobPage,
+  component: NewEventPage,
 })
 
 const aboutRoute = createRoute({
@@ -44,7 +44,7 @@ const aboutRoute = createRoute({
 
 export const routeTree = rootRoute.addChildren([
   indexRoute,
-  jobDetailRoute,
-  newJobRoute,
+  eventDetailRoute,
+  newEventRoute,
   aboutRoute,
 ])

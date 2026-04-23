@@ -19,10 +19,10 @@ export function Layout({ children }: { children: ReactNode }) {
 
           <nav className="main-nav">
             <Link to="/" className="nav-link" activeProps={{ className: 'nav-link active' }} activeOptions={{ exact: true }}>
-              <ClipboardList size={18} /> <span>Job Board</span>
+              <ClipboardList size={18} /> <span>Event Board</span>
             </Link>
             <Link to="/new" className="nav-link" activeProps={{ className: 'nav-link active' }}>
-              <PlusCircle size={18} /> <span>Post a Job</span>
+              <PlusCircle size={18} /> <span>Post an Event</span>
             </Link>
             <Link to="/about" className="nav-link" activeProps={{ className: 'nav-link active' }}>
               <Info size={18} /> <span>About</span>
