@@ -14,10 +14,13 @@ const queryClient = new QueryClient({
   },
 })
 
+const basepath = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
+
 const router = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: 'intent',
+  basepath,
 })
 
 declare module '@tanstack/react-router' {
