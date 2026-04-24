@@ -1,10 +1,10 @@
-# Dad Ops
+# Muck-In
 
-A simple volunteer board for a school's "Dad Ops" crew — a sub-group of the Parents & Teachers Community who pick up hands-on jobs around the school (builds, mowing, working bees, event rosters). Parents Committee leaders post events. Dads put their name down.
+A simple volunteer board for a school's Muck-In crew — a sub-group of the Parents & Teachers Community who pick up hands-on jobs around the school (builds, mowing, working bees, event rosters). Parents Committee leaders post events. Dads put their name down.
 
 No accounts. No emails. Just a name on a list and a job to knock over.
 
-**Live site:** https://novalogix-ckc.github.io/Dad-Ops/
+**Live site:** https://novalogix-ckc.github.io/Dad-Ops/ *(URL reflects the current GitHub repo name; rename the repo to update it)*
 
 ---
 
@@ -77,7 +77,7 @@ A **slot** is the unit people sign into. That unification is what lets one data 
 | `/` | Event board — hero with live counts, Upcoming grid, Jobs Done grid |
 | `/events/:eventId` | Event detail — brief, meta, per-style signup UI, mark-done button |
 | `/new` | Post an event — dynamic form with style picker and jobs/sessions builder |
-| `/about` | One-pager describing the Dad Ops crew |
+| `/about` | One-pager describing the Muck-In crew |
 
 ---
 

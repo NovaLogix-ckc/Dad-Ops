@@ -4,12 +4,12 @@ export function AboutPage() {
   return (
     <div className="page">
       <div className="page-head">
-        <span className="eyebrow"><Hammer size={14} /> ABOUT DAD OPS</span>
+        <span className="eyebrow"><Hammer size={14} /> ABOUT MUCK-IN</span>
         <h1 className="page-title">A crew of dads. A list of jobs.</h1>
         <p className="muted">
-          Dad Ops is a small, committed sub-group of our school's Parents & Teachers
+          Muck-In is a small, committed sub-group of our school's Parents & Teachers
           community. When something around the school needs building, fixing, mowing,
-          moving, or clearing — we're the blokes who pick up a tool and sort it.
+          moving, or clearing — we're the blokes who pick up a tool and muck in.
         </p>
       </div>
 

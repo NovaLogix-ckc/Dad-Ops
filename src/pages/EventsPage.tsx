@@ -17,7 +17,7 @@ export function EventsPage() {
     <div className="page">
       <section className="hero">
         <div className="hero-copy">
-          <span className="eyebrow"><Wrench size={14} /> DAD OPS · EVENT BOARD</span>
+          <span className="eyebrow"><Wrench size={14} /> MUCK-IN · EVENT BOARD</span>
           <h1 className="hero-title">Pick up a tool. Pick up a job.</h1>
           <p className="hero-sub">
             The Parents & Teachers Committee posts what needs doing — working bees,
